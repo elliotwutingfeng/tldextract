@@ -279,7 +279,7 @@ class TLDExtract:
             fallback_to_snapshot=self.fallback_to_snapshot,
         )
 
-        if not any([public_tlds, private_tlds, self.extra_suffixes]):
+        if not any((public_tlds, private_tlds, self.extra_suffixes)):
             raise ValueError("No tlds set. Cannot proceed without tlds.")
 
         self._extractor = _PublicSuffixListTLDExtractor(
