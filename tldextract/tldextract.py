@@ -180,7 +180,7 @@ class TLDExtract:
         and read timeouts
         """
         suffix_list_urls = suffix_list_urls or ()
-        self.suffix_list_urls = tuple(url for url in suffix_list_urls 
+        self.suffix_list_urls = tuple(stripped_url for url in suffix_list_urls 
                                       for stripped_url in (url.strip(),) if stripped_url)
 
         self.fallback_to_snapshot = fallback_to_snapshot
