@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-"""`tldextract` accurately separates the gTLD or ccTLD (generic or country code
-top-level domain) from the registered domain and subdomains of a URL.
+""" `tldextract` accurately separates a URL's subdomain, domain, and public suffix,
+using the Public Suffix List (PSL).
 
     >>> import tldextract
 
@@ -52,7 +51,7 @@ or suffix were found:
 import logging
 import os
 from functools import wraps
-from typing import List, NamedTuple, Optional, Sequence, Union
+from typing import FrozenSet, List, NamedTuple, Optional, Sequence, Union
 
 import idna
 
@@ -301,7 +300,8 @@ def extract(  # pylint: disable=missing-function-docstring
 
 
 @wraps(TLD_EXTRACTOR.update)
-def update(*args, **kwargs):  # pylint: disable=missing-function-docstring
+# pylint: disable-next=missing-function-docstring
+def update(*args, **kwargs):  # type: ignore[no-untyped-def]
     return TLD_EXTRACTOR.update(*args, **kwargs)
 
 
@@ -311,7 +311,11 @@ class _PublicSuffixListTLDExtractor:
     """
 
     def __init__(
-        self, public_tlds, private_tlds, extra_tlds, include_psl_private_domains=False
+        self,
+        public_tlds: List[str],
+        private_tlds: List[str],
+        extra_tlds: List[str],
+        include_psl_private_domains: bool = False,
     ):
         # set the default value
         self.include_psl_private_domains = include_psl_private_domains
@@ -320,7 +324,9 @@ class _PublicSuffixListTLDExtractor:
         self.tlds_incl_private = frozenset(public_tlds + private_tlds + extra_tlds)
         self.tlds_excl_private = frozenset(public_tlds + extra_tlds)
 
-    def tlds(self, include_psl_private_domains=None):
+    def tlds(
+        self, include_psl_private_domains: Optional[bool] = None
+    ) -> FrozenSet[str]:
         """Get the currently filtered list of suffixes."""
         if include_psl_private_domains is None:
             include_psl_private_domains = self.include_psl_private_domains
@@ -331,7 +337,9 @@ class _PublicSuffixListTLDExtractor:
             else self.tlds_excl_private
         )
 
-    def suffix_index(self, lower_spl, include_psl_private_domains=None):
+    def suffix_index(
+        self, lower_spl: List[str], include_psl_private_domains: Optional[bool] = None
+    ) -> int:
         """Returns the index of the first suffix label.
         Returns len(spl) if no suffix is found
         """
@@ -353,12 +361,12 @@ class _PublicSuffixListTLDExtractor:
         return length
 
 
-def _decode_punycode(label):
+def _decode_punycode(label: str) -> str:
     lowered = label.lower()
     looks_like_puny = lowered.startswith("xn--")
     if looks_like_puny:
         try:
-            return idna.decode(label.encode("ascii")).lower()
+            return idna.decode(lowered)
         except (UnicodeError, IndexError):
             pass
     return lowered

@@ -1,22 +1,22 @@
-# tldextract
+# tldextract [![PyPI version](https://badge.fury.io/py/tldextract.svg)](https://badge.fury.io/py/tldextract) [![Build Status](https://travis-ci.com/john-kurkowski/tldextract.svg?branch=master)](https://app.travis-ci.com/github/john-kurkowski/tldextract)
 
-## Python Module [![PyPI version](https://badge.fury.io/py/tldextract.svg)](https://badge.fury.io/py/tldextract) [![Build Status](https://travis-ci.com/john-kurkowski/tldextract.svg?branch=master)](https://travis-ci.com/john-kurkowski/tldextract)
+`tldextract` accurately separates a URL's subdomain, domain, and public suffix,
+using [the Public Suffix List (PSL)](https://publicsuffix.org).
 
-`tldextract` accurately separates the gTLD or ccTLD (generic or country code
-top-level domain) from the registered domain and subdomains of a URL. For
-example, say you want just the 'google' part of 'http://www.google.com'.
+Say you want just the "google" part of https://www.google.com. *Everybody gets
+this wrong.* Splitting on the "." and taking the 2nd-to-last element only works
+for simple domains, e.g. .com. Consider
+[http://forums.bbc.co.uk](http://forums.bbc.co.uk): the naive splitting method
+will give you "co" as the domain, instead of "bbc". Rather than juggle TLDs,
+gTLDs, or ccTLDs  yourself, `tldextract` extracts the currently living public
+suffixes according to [the Public Suffix List](https://publicsuffix.org).
 
-*Everybody gets this wrong.* Splitting on the '.' and taking the last 2
-elements goes a long way only if you're thinking of simple e.g. .com
-domains. Think parsing
-[http://forums.bbc.co.uk](http://forums.bbc.co.uk) for example: the naive
-splitting method above will give you 'co' as the domain and 'uk' as the TLD,
-instead of 'bbc' and 'co.uk' respectively.
+> A "public suffix" is one under which Internet users can directly register
+> names.
 
-`tldextract` on the other hand knows what all gTLDs and ccTLDs look like by
-looking up the currently living ones according to [the Public Suffix List
-(PSL)](http://www.publicsuffix.org). So, given a URL, it knows its subdomain
-from its domain, and its domain from its country code.
+A public suffix is also sometimes called an effective TLD (eTLD).
+
+## Usage
 
 ```python
 >>> import tldextract
@@ -75,13 +75,13 @@ or suffix were found:
 By default, this package supports the public ICANN TLDs and their exceptions.
 You can optionally support the Public Suffix List's private domains as well.
 
-This module started by implementing the chosen answer from [this StackOverflow question on
+This package started by implementing the chosen answer from [this StackOverflow question on
 getting the "domain name" from a URL](http://stackoverflow.com/questions/569137/how-to-get-domain-name-from-url/569219#569219).
 However, the proposed regex solution doesn't address many country codes like
 com.au, or the exceptions to country codes like the registered domain
-parliament.uk. The Public Suffix List does, and so does this module.
+parliament.uk. The Public Suffix List does, and so does this package.
 
-### Installation
+## Install
 
 Latest release on PyPI:
 
@@ -102,9 +102,9 @@ tldextract http://forums.bbc.co.uk
 # forums bbc co.uk
 ```
 
-### Note About Caching
+## Note about caching
 
-Beware when first running the module, it updates its TLD list with a live HTTP
+Beware when first calling `tldextract`, it updates its TLD list with a live HTTP
 request. This updated TLD set is usually cached indefinitely in `$HOME/.cache/python-tldextract`.
 To control the cache's location, set TLDEXTRACT_CACHE environment variable or set the
 cache_dir path in TLDExtract initialization.
@@ -124,7 +124,7 @@ custom_cache_extract = tldextract.TLDExtract(cache_dir='/path/to/your/cache/')
 custom_cache_extract('http://www.google.com')
 
 # extract callable that doesn't use caching
-no_cache_extract = tldextract.TLDExtract(cache_dir=False)
+no_cache_extract = tldextract.TLDExtract(cache_dir=None)
 no_cache_extract('http://www.google.com')
 ```
 
@@ -143,9 +143,9 @@ env TLDEXTRACT_CACHE="~/tldextract.cache" tldextract --update
 
 It is also recommended to delete the file after upgrading this lib.
 
-### Advanced Usage
+## Advanced usage
 
-#### Public vs. Private Domains
+### Public vs. private domains
 
 The PSL [maintains a concept of "private"
 domains](https://publicsuffix.org/list/).
@@ -183,7 +183,7 @@ mentally parse a URL. It doesn't assume familiarity with the PSL nor that the
 PSL makes such a distinction. Note this may run counter to the default parsing
 behavior of other, PSL-based libraries.
 
-#### Specifying your own URL or file for the Suffix List data
+### Specifying your own URL or file for Public Suffix List data
 
 You can specify your own input data in place of the default Mozilla Public Suffix List:
 
@@ -211,9 +211,9 @@ extract = tldextract.TLDExtract(
 Use an absolute path when specifying the `suffix_list_urls` keyword argument.
 `os.path` is your friend.
 
-### FAQ
+## FAQ
 
-#### Can you add suffix \_\_\_\_? Can you make an exception for domain \_\_\_\_?
+### Can you add suffix \_\_\_\_? Can you make an exception for domain \_\_\_\_?
 
 This project doesn't contain an actual list of public suffixes. That comes from
 [the Public Suffix List (PSL)](https://publicsuffix.org/). Submit amendments there.
@@ -222,7 +222,7 @@ This project doesn't contain an actual list of public suffixes. That comes from
 forking the PSL and using your fork in the `suffix_list_urls` param, or adding
 your suffix piecemeal with the `extra_suffixes` param.)
 
-#### If I pass an invalid URL, I still get a result, no error. What gives?
+### If I pass an invalid URL, I still get a result, no error. What gives?
 
 To keep `tldextract` light in LoC & overhead, and because there are plenty of
 URL validators out there, this library is very lenient with input. If valid
@@ -241,7 +241,7 @@ validation, either receiving exceptions or error metadata on results.
 2. Change into the new directory.
 3. `pip install tox`
 
-### Running the Test Suite
+### Running the test suite
 
 Run all tests against all supported Python versions:
 
